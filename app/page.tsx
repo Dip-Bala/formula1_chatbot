@@ -5,20 +5,23 @@ import { PromtSuggestionsRow } from "./components/PromtSuggestionsRow";
 import { LoadingBubble } from "./components/LoadingBubble";
 import { UIMessage, useChat, useCompletion } from "@ai-sdk/react";
 import { Bubble } from "./components/Bubble";
+import { FormEvent, useState } from "react";
 
 export default function Home() {
-  const {isLoading, input, handleSubmit, handleInputChange} = useCompletion();
+  // const {isLoading, input, handleSubmit, handleInputChange} = useCompletion();
   const {messages, sendMessage, status } = useChat({});
+  const [input, setInput] = useState('');
   const noMessages = !messages || messages.length === 0
   const handlePromt=(promtText: string) => {
-      const msg = {
-        id: crypto.randomUUID(),
-        role: 'user',
-        metadata: {
-          content: promtText
-        }
-      }
-      
+    console.log(".............................", promtText);
+      sendMessage({text: promtText});
+    console.log("message", messages);
+  }
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    sendMessage({text: input});
+    setInput('');
+
   }
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
@@ -44,12 +47,12 @@ export default function Home() {
               <>
               {/* map messages into text bubbles */}
               {messages.map((message, index) => <Bubble  key={`message-${index}`} message={message}/>)}
-              {isLoading && <LoadingBubble/>}
+              {status === 'streaming' && <LoadingBubble/>}
               </>
             )
           }
           <form onSubmit={handleSubmit} className="flex justify-between w-full gap-4">
-            <input type="text" onChange={handleInputChange} placeholder="Ask me something..." className="w-full border border-zinc-700 rounded-full px-6 py-4 bg-zinc-900"/>
+            <input type="text" onChange={(e) => setInput(e.target.value)} value={input} placeholder="Ask me something..." className="w-full border border-zinc-700 rounded-full px-6 py-4 bg-zinc-900"/>
             <input type="submit" className="border border-zinc-700 rounded-full px-6 py-4 bg-zinc-900 "/>
           </form>
         </section>

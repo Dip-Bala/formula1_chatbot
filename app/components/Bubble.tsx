@@ -1,11 +1,11 @@
+import { UIMessage } from "@ai-sdk/react";
 
 interface BubbleProp {
-    message: any
+    message: UIMessage
 }
 
 export function Bubble({message}: BubbleProp){
-    const {content, role} = message;
     return (
-        <div>{content}</div>
+        <div>{message.parts[0].text}</div>
     )
 }
