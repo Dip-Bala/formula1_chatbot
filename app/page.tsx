@@ -13,25 +13,26 @@ export default function Home() {
   const [input, setInput] = useState('');
   const noMessages = !messages || messages.length === 0
   const handlePromt=(promtText: string) => {
-    console.log(".............................", promtText);
+    // console.log(".............................", promtText);
       sendMessage({text: promtText});
-    console.log("message", messages);
+    // console.log("message", messages);
   }
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     sendMessage({text: input});
     setInput('');
-
   }
+  console.log(messages, messages)
   return (
     <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-4xl flex-col bg-white dark:bg-black sm:items-start py-8 justify-between items-center">
+      <main className="flex min-h-screen w-full max-w-4xl flex-col  sm:items-start py-8 justify-between items-center z-100">
         <Image
           // className="dark:invert"
           src="/formula 1.avif"
           alt="Next.js logo"
-          width={900}
+          width={1000}
           height={20}
+          className="bg-cover absolute -z-5 rotate-90"
         />
         <section>
           {
@@ -47,7 +48,7 @@ export default function Home() {
               <>
               {/* map messages into text bubbles */}
               {messages.map((message, index) => <Bubble  key={`message-${index}`} message={message}/>)}
-              {status === 'streaming' && <LoadingBubble/>}
+              {status === "submitted" && <LoadingBubble/>}
               </>
             )
           }

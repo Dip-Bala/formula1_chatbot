@@ -4,35 +4,22 @@ import {
   Page,
   PuppeteerWebBaseLoader,
 } from "@langchain/community/document_loaders/web/puppeteer";
-import { DataAPIClient } from "@datastax/astra-db-ts";
-import { GoogleGenAI } from "@google/genai";
 import { RecursiveCharacterTextSplitter } from "@langchain/textsplitters";
-const {
-  ASTRA_DB_KEYSPACE,
-  ASTRA_DB_COLLECTION,
-  ASTRA_DB_API_ENDPOINT,
-  ASTRA_DB_APPLICATION_TOKEN,
-  GEMINI_API_KEY,
-} = process.env;
+import { Pinecone } from "@pinecone-database/pinecone";
+const { PINECONE_INDEX_NAME, PINECONE_DB_API_KEY, PINECONE_NAMESPACE} = process.env;
 
-if (
-  !ASTRA_DB_KEYSPACE ||
-  !ASTRA_DB_COLLECTION ||
-  !ASTRA_DB_API_ENDPOINT ||
-  !ASTRA_DB_APPLICATION_TOKEN ||
-  !GEMINI_API_KEY
-)
-  {throw Error("Environment Variables are not loaded");
+if (!PINECONE_INDEX_NAME || !PINECONE_DB_API_KEY || !PINECONE_NAMESPACE) {
+  throw Error("Environment Variables are not loaded");
+}
 
-  }
+const BATCH_SIZE = 80;
+const SLEEP_MS = 15_000;
 
 const f1Data = [
   "https://en.wikipedia.org/wiki/Formula_One",
   "https://www.formula1.com/en/drivers",
   "https://www.formula1.com/en/latest",
   "https://www.formula1.com/en/teams",
-  "https://aws.amazon.com/sports/f1/",
-  "https://www.skysports.com/f1",
 ];
 
 const splitter = new RecursiveCharacterTextSplitter({
@@ -40,53 +27,42 @@ const splitter = new RecursiveCharacterTextSplitter({
   chunkOverlap: 100,
 });
 
-const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
 
-const client = new DataAPIClient();
-const database = client.db(ASTRA_DB_API_ENDPOINT, {
-  token: ASTRA_DB_APPLICATION_TOKEN,
+const pc = new Pinecone({
+  apiKey: PINECONE_DB_API_KEY,
 });
-console.log(`Connected to database ${database}`);
-// console.log(database);
 
-const createCollection = async () => {
-  const collection = await database.createCollection(ASTRA_DB_COLLECTION, {
-    keyspace: ASTRA_DB_KEYSPACE,
-    vector: {
-      dimension: 768,
-      metric: "cosine",
-    },
-  });
-  console.log(collection);
-};
+function sleep(ms: number) {
+  return new Promise(res => setTimeout(res, ms));
+}
 
-const loadSampleData = async () => {
-  const collection = await database.collection(ASTRA_DB_COLLECTION);
+function chunkArray<T>(arr:T[]): T[][] {
+  const chunks: T[][] = [];
+  for(let i = 0; i < arr.length; i +=BATCH_SIZE){
+    chunks.push(arr.slice(i, i+BATCH_SIZE));
+  }
+  return chunks;
+}
+
+const seedDB = async () => {
+  const namespace = pc.index(PINECONE_INDEX_NAME).namespace(PINECONE_NAMESPACE)
   for await (const url of f1Data) {
     const content = await scrapePage(url);
     const chunks = await splitter.splitText(content);
-    for await (const chunk of chunks) {
-      const embedding = await ai.models.embedContent({
-        model: "gemini-embedding-001",
-        contents: chunk,
-        config: {
-          taskType: "RETRIEVAL_DOCUMENT",
-          outputDimensionality: 768,
-        },
-      });
-      console.log("embeddings", embedding.embeddings);
-
-      const vector = embedding.embeddings![0].values;
-      try {
-        const res = await collection.insertOne({
-          vector: vector,
-          text: chunk,
-        });
-        console.log("res", res);
-      } catch (e) {
-        console.log("error", e);
-      }
+    
+    const records = chunks.map((chunk) => ({
+      _id : crypto.randomUUID(),
+      text: chunk
+    }))
+    // console.log(records);
+    const batches = chunkArray(records);
+    for(const batch of batches){
+      await namespace.upsertRecords(batch);
     }
+     console.log(
+      `Upserted ${records.length} chunks from ${url} in ${batches.length} batches`
+    );
+    await sleep(SLEEP_MS)
   }
 };
 
@@ -109,4 +85,4 @@ const scrapePage = async (url: string) => {
   return (await loader.scrape())?.replace(/<[^>]*>?/gm, "");
 };
 
-createCollection().then(() => loadSampleData());
+seedDB();
