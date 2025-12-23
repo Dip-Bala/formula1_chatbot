@@ -16,10 +16,17 @@ const BATCH_SIZE = 80;
 const SLEEP_MS = 15_000;
 
 const f1Data = [
-  "https://en.wikipedia.org/wiki/Formula_One",
+  // "https://en.wikipedia.org/wiki/Formula_One",
+  // "https://www.formula1.com/en/drivers",
+  // "https://www.formula1.com/en/latest",
+  // "https://www.formula1.com/en/teams",
+  "https://www.formula1.com/en/results/2025/races",
+  "https://inmotion.dhl/en/formula-1/fastest-lap-award",
+  "https://www.formula1.com/en/results/2025/drivers",
+  "https://www.formula1.com/en/results/2025/team",
+  "https://www.formula1.com/en/latest/article/formula-1-reveals-calendar-for-2026-season.YctbMZWqBvrgyddrnauo8",
   "https://www.formula1.com/en/drivers",
-  "https://www.formula1.com/en/latest",
-  "https://www.formula1.com/en/teams",
+
 ];
 
 const splitter = new RecursiveCharacterTextSplitter({
