@@ -5,21 +5,22 @@ interface PromtSuggestionsRowProps {
 }
 
 export function PromtSuggestionsRow({ handlePromt }: PromtSuggestionsRowProps) {
-  const prompts = [
-    "Who won the most F1 championships?",
-    "Who is the highest-paid F1 driver right now?",
-    "Which F1 team is fastest this season?",
-    "Explain DRS like I’m new to F1",
-    "Why is Red Bull so dominant in recent years?",
-    "How does F1 qualifying actually work?",
-  ];
+ const promts = [
+  "Who is leading the 2025 F1 championship?",
+  "Explain Red Bull’s race strategy advantage",
+  "Who are the top rookies this season?",
+  "What happened in the last Grand Prix?",
+  "Compare Verstappen and Hamilton careers",
+  "Which team has the fastest pit stops?",
+];
+
 
   return (
     <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
-      {prompts.map((prompt, index) => (
+      {promts.map((promt, index) => (
         <PromtSuggestionsButton
           key={`suggestion-${index}`}
-          text={prompt}
+          text={promt}
           onClick={handlePromt}
         />
       ))}

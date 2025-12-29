@@ -27,25 +27,50 @@ export default function Home() {
   return (
     <div className="relative min-h-screen bg-black text-white overflow-hidden">
       {/* Background Image */}
-      <Image
-        src="/formula 1.avif"
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_#ff000020,_transparent_60%)] pointer-events-none" />
+
+      {/* <Image
+        src="/logo2.png"
         alt="Formula 1"
         fill
         priority
-        className="object-cover opacity-10"
-      />
+        className="object-cover opacity-20"
+      /> */}
 
       {/* Overlay */}
       <div className="relative z-10 flex min-h-screen flex-col items-center justify-between">
         {/* Header */}
-        <header className="w-full max-w-4xl px-6 py-6">
-          <h1 className="text-3xl font-bold tracking-tight text-red-700">
-            F1 Insight
-          </h1>
-          <p className="text-sm text-zinc-400 mt-1">
-            pit. pit. pit. — Ask anything Formula 1
-          </p>
-        </header>
+        <header className="w-full max-w-5xl mx-auto px-6 pt-6 pb-4 flex items-center justify-between">
+  <div className="flex items-center gap-3">
+    {/* Logo mark */}
+    <div className="flex items-center gap-2">
+      <div className="w-3 h-8 bg-red-600 rounded-sm" />
+      <h1 className="text-2xl font-extrabold tracking-tight">
+        <span className="text-red-600">F1</span>
+        <span className="text-white">INSIGHT</span>
+      </h1>
+    </div>
+
+    <span className="hidden sm:inline text-xs text-zinc-400 tracking-wide ml-3">
+      AI-powered Formula 1 intelligence
+    </span>
+  </div>
+
+  <div className="text-xs text-zinc-500 hidden md:block">
+    Powered by AI · Updated live
+  </div>
+</header>
+<div className="mt-10 mb-6 text-center">
+  <h2 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+    Your <span className="text-red-500">Race Engineer</span> for Formula 1
+  </h2>
+  <p className="mt-3 text-zinc-400 max-w-xl mx-auto">
+    Get instant insights on drivers, teams, strategies, and race weekends —
+    powered by real data and AI reasoning.
+  </p>
+</div>
+
+
 
         {/* Chat Area */}
         <main className="flex-1 w-full max-w-4xl  px-6 overflow-y-scroll ">
@@ -82,7 +107,7 @@ export default function Home() {
             />
             <button
               type="submit"
-              className="rounded-full bg-red-600 px-6 py-4 text-sm font-semibold hover:bg-red-700 transition"
+              className="rounded-full bg-red-600 px-6 py-4 text-sm font-semibold hover:bg-red-700 transition cursor-pointer"
             >
               Send
             </button>

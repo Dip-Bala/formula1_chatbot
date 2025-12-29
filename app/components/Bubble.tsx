@@ -7,9 +7,9 @@ interface BubbleProps {
 export function Bubble({ message }: BubbleProps) {
   return (
     <div
-      className={`max-w-[80%] rounded-xl px-4 py-3 mb-3 ${
+      className={`max-w-[80%] rounded-2xl px-4 py-3 mb-3 ${
         message.role === "user"
-          ? "bg-red-700 text-white self-end"
+          ? "bg-red-600 text-white self-end"
           : "bg-zinc-800 text-white self-start"
       }`}
     >
