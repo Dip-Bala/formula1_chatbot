@@ -26,7 +26,7 @@ const namespace = pc.index(PINECONE_INDEX_NAME).namespace(PINECONE_NAMESPACE);
 
 let augmentedContext = "";
 
-export async function POST(req: NextRequest, res: NextResponse) {
+export async function POST(req: NextRequest): Promise<Response> {
   const body = await req.json();
   const { id, messages } = body;
   // console.log(messages[0].parts);
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest, res: NextResponse) {
   } catch (err) {
     augmentedContext = "";
   }
-const systemPrompt = `
+  const systemPrompt = `
 You are an expert Formula 1 analyst and historian.
 
 IMPORTANT TIME CONTEXT:
@@ -96,15 +96,10 @@ ${lastMessage}
 Answer:
 `;
 
-
-
   const result = streamText({
     model: google("gemini-2.5-flash"),
     system: systemPrompt,
     messages: convertToModelMessages(messages),
-
-  })
+  });
   return result.toUIMessageStreamResponse();
-
-  
 }
